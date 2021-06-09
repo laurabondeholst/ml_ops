@@ -1,16 +1,26 @@
 from torchvision import datasets, transforms
-import numpy as np # to calculate number of detected labels
+import numpy as np  # to calculate number of detected labels
 import pytest
 import pdb
-import torch # to get dataloader
+import torch  # to get dataloader
 
 
+transform = transforms.Compose(
+    [transforms.ToTensor(), transforms.Normalize((0.5,), (0.5,))]
+)
 
-transform = transforms.Compose([transforms.ToTensor(),
-                                transforms.Normalize((0.5,), (0.5,))])
-
-train_set = datasets.MNIST('~/Documents/MLOps/mlops_project/data/processed', download=True, train=True, transform=transform)
-test_set = datasets.MNIST('~/Documents/MLOps/mlops_project/data/processed', download=True, train=False, transform=transform)
+train_set = datasets.MNIST(
+    "~/Documents/MLOps/mlops_project/data/processed",
+    download=True,
+    train=True,
+    transform=transform,
+)
+test_set = datasets.MNIST(
+    "~/Documents/MLOps/mlops_project/data/processed",
+    download=True,
+    train=False,
+    transform=transform,
+)
 # train_loader = torch.utils.data.DataLoader(train_set, batch_size=64, shuffle=True)
 # test_loader = torch.utils.data.DataLoader(test_set, batch_size=64, shuffle=True)
 
@@ -27,16 +37,14 @@ def test_length():
     """
     Testing if the length of the train and test set are correct
     """
-    assert len(train_set) == 60000  and len(test_set) == 10000
+    assert len(train_set) == 60000 and len(test_set) == 10000
+
 
 @pytest.mark.parametrize("dataset", [train_set, test_set])
 def test_dataset_shape(dataset):
     for datapoint in dataset.data:
         s = datapoint.shape
-        assert s == torch.Size([28,28]) or s == [728]
-
-
-
+        assert s == torch.Size([28, 28]) or s == [728]
 
 
 @pytest.mark.parametrize("dataset", [train_set, test_set])
@@ -46,7 +54,7 @@ def test_label_detect(dataset):
     """
     label_check = []
     no_labels = 10
-    for i in range(0,no_labels):
+    for i in range(0, no_labels):
         label_check.append(False)
 
     label_check = np.array(label_check)
@@ -56,5 +64,5 @@ def test_label_detect(dataset):
             label_check[label] = True
         elif label_check.sum() == no_labels:
             break
-        
+
     assert label_check.sum() == no_labels
